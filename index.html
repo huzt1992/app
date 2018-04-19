@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div class=`select-category`>
+        <form>
+            <select name=`text`>
+
+            </select>
+        </form>
+    </div>
+
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <script>
+     
+    ytApp = {}
+
+
+    ytApp.ulr = `https://www.googleapis.com/youtube/v3/playlists`
+
+
+    ytApp.getCategoryId = () =>{
+        $.ajax({
+		type: "GET",
+		url: "https://www.googleapis.com/youtube/v3/guideCategories",
+		data: {
+			regionCode:`CA`,
+			part: "snippet",
+		    key: `AIzaSyDesSQ9lP0MRQSVsZdPLTpyT7aHMoQv7LU`
+        }}).then(res=>{
+            res=res.items
+            console.log(res);
+            
+
+            res=ytApp.extractCategory(res); //
+            console.log(res);
+
+            ytApp.displayOption(res);
+            // importing option
+
+            ytApp.selectOption(res); ////
+
+            })
+    }
+
+    // category id gets different channels
+
+            ytApp.extractCategory = res =>{
+                return res.map(function(a){
+                    let c={};
+                    c.id=a.id;
+                    c.title=a.snippet.title;
+                    return c;
+                }
+                )
+            }
+
+
+
+
+            ytApp.displayOption = res =>{                       
+                for(let i=0;i<10;i++){
+                    let option = $(`<option>`).text(res[i].title)
+                    $(`select`).append(option)    
+                }
+            }
+
+
+
+
+        ytApp.selectOption=(res)=>{
+            console.log(`selectOption`)
+
+            $(`select`).change(()=>{
+
+                let titles = $(`option:selected`).text()
+                console.log(titles)//
+                
+                ytApp.titleToId(res,titles)  //////                 
+            })
+         }
+
+
+            ytApp.titleToId=(res,titles)=>{
+                res=res.filter(titl=>{
+                    return titl.title==titles})
+                
+                console.log(res)
+                let CategoryId = res[0].id
+                console.log(CategoryId)
+
+                ytApp.getChannellist(CategoryId)  ////////
+               
+            }
+ 
+
+
+
+                ytApp.getChannellist = id =>{
+
+                    console.log(id)
+                    $.ajax({
+                    type: "GET",
+                    url: "https://www.googleapis.com/youtube/v3/channels",
+                    data: {
+                    categoryId: id,
+                    part: "snippet",
+                    key: `AIzaSyDesSQ9lP0MRQSVsZdPLTpyT7aHMoQv7LU`
+                    }}).then(res=>{console.log(res)})   //////////   
+                }
+
+
+        // select event
+
+
+
+
+    ytApp.init=()=>{
+        ytApp.getCategoryId();
+     }
+    
+
+    $(function(){
+        ytApp.init()
+    })
+
+
+    </script>
+</body>
+</html>
